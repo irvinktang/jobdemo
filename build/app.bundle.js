@@ -41653,6 +41653,8 @@ var Jobs = function (_React$Component) {
     _this.state = {
       url: '',
       reqId: '',
+      reqStatus: '',
+      reqInfo: '',
       jobId: '',
       showJobId: false,
       showStatus: false
@@ -41684,11 +41686,7 @@ var Jobs = function (_React$Component) {
       }).then(function (res) {
         return res.json();
       }).then(function (json) {
-        if (json.error) {
-          alert('Error: ' + json.error);
-        } else {
-          _this2.setState({ jobId: json.id, showJobId: true });
-        }
+        _this2.setState({ jobId: json.id, showJobId: true });
       }).catch(function (err) {
         console.log('ERROR: ', err);
       });
@@ -41696,11 +41694,14 @@ var Jobs = function (_React$Component) {
   }, {
     key: 'requestJob',
     value: function requestJob(event) {
+      var _this3 = this;
+
       event.preventDefault();
       fetch('/jobs/' + this.state.reqId).then(function (res) {
         return res.json();
       }).then(function (json) {
-        console.log(JSON.parse(json));
+        var data = JSON.parse(json);
+        _this3.setState({ reqStatus: data.status, reqInfo: data.html || 'Still processing...', showStatus: true });
       });
     }
   }, {
@@ -41813,8 +41814,8 @@ var Jobs = function (_React$Component) {
             React.createElement(
               _reactBootstrap.Modal.Title,
               null,
-              'Job ID: ',
-              this.state.jobId
+              'Requested Job:',
+              this.state.reqId
             )
           ),
           React.createElement(
@@ -41823,7 +41824,13 @@ var Jobs = function (_React$Component) {
             React.createElement(
               'h2',
               null,
-              'Use this ID to access status of submitted job'
+              'Job Status: ',
+              this.state.reqStatus
+            ),
+            React.createElement(
+              'p',
+              null,
+              this.state.reqInfo
             )
           ),
           React.createElement(

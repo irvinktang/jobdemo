@@ -13,6 +13,8 @@ class Jobs extends React.Component {
     this.state = {
       url: '',
       reqId: '',
+      reqStatus:'',
+      reqInfo: '',
       jobId: '',
       showJobId: false,
       showStatus: false
@@ -39,11 +41,7 @@ class Jobs extends React.Component {
     })
     .then((res) => res.json())
     .then((json) => {
-      if(json.error) {
-        alert(`Error: ${json.error}`)
-      } else {
         this.setState({jobId: json.id, showJobId: true})
-      }
       })
       .catch(function(err) {
         console.log('ERROR: ', err);
@@ -55,7 +53,8 @@ class Jobs extends React.Component {
       fetch(`/jobs/${this.state.reqId}`)
         .then((res) => res.json())
         .then((json) => {
-          console.log(JSON.parse(json))
+          var data = JSON.parse(json)
+          this.setState({reqStatus:data.status, reqInfo: data.html || 'Still processing...', showStatus: true})
         })
     }
 
@@ -108,10 +107,11 @@ class Jobs extends React.Component {
 
         <Modal show={this.state.showStatus} onHide={this.closeStatus}>
         <Modal.Header closeButton>
-        <Modal.Title>Job ID: {this.state.jobId}</Modal.Title>
+        <Modal.Title>Requested Job:{this.state.reqId}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-        <h2>Use this ID to access status of submitted job</h2>
+        <h2>Job Status: {this.state.reqStatus}</h2>
+        <p>{this.state.reqInfo}</p>
         </Modal.Body>
         <Modal.Footer>
         <Button onClick={this.closeStatus}>Close</Button>
