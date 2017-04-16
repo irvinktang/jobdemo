@@ -4,9 +4,6 @@ var rsb = require('react-bootstrap');
 
 import {Modal, Button} from 'react-bootstrap'
 
-//<form className="form-signin" method="POST" action="/submit">
-//Posting to endpoint - alternative
-
 class Jobs extends React.Component {
   constructor(props) {
     super(props);

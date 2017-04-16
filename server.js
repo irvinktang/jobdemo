@@ -62,6 +62,6 @@ function processJob(err, job) {
 
 client.blpop('jobQueue',2, processJob)
 
-app.listen(3000, function(){
+app.listen(process.env.PORT || 3000, function(){
   console.log('running')
 })
