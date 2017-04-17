@@ -41675,7 +41675,6 @@ var Jobs = function (_React$Component) {
       fetch('/data').then(function (res) {
         return res.json();
       }).then(function (json) {
-        console.log(json["data"]);
         _this2.setState({ jobData: json["data"] });
       });
     }
@@ -41696,11 +41695,7 @@ var Jobs = function (_React$Component) {
       }).then(function (res) {
         return res.json();
       }).then(function (json) {
-        console.log(json["data"]);
         _this3.setState({ jobId: json["id"].id, jobData: json["data"], showJobId: true });
-        Object.keys(json["data"]).map(function (jobs) {
-          return console.log(JSON.parse(_this3.state.jobData[jobs]).status);
-        });
       }).catch(function (err) {
         console.log('ERROR: ', err);
       });
@@ -41917,12 +41912,7 @@ var Jobs = function (_React$Component) {
   return Jobs;
 }(React.Component);
 
-// {this.state.data ? Object.keys(this.state.jobData).map((jobId) => {
-//   var data = this.state.jobData
-//   return <tr><td>{JSON.parse(data[jobId]).url}</td><td>{JSON.parse(data[jobId]).status}</td><td>{jobId}</td></tr>
-// }) : null}
-
-ReactDOM.render(React.createElement(Jobs, { name: 'Irvin' }), document.getElementById('root'));
+ReactDOM.render(React.createElement(Jobs, null), document.getElementById('root'));
 
 /***/ })
 /******/ ]);

@@ -146,4 +146,4 @@ class Jobs extends React.Component {
     }
   }
 
-  ReactDOM.render(<Jobs name='Irvin' />, document.getElementById('root'))
+  ReactDOM.render(<Jobs />, document.getElementById('root'))
