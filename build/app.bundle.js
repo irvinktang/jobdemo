@@ -41639,9 +41639,6 @@ var React = __webpack_require__(0);
 var ReactDOM = __webpack_require__(18);
 var rsb = __webpack_require__(80);
 
-//<form className="form-signin" method="POST" action="/submit">
-//Posting to endpoint - alternative
-
 var Jobs = function (_React$Component) {
   _inherits(Jobs, _React$Component);
 
@@ -41656,6 +41653,7 @@ var Jobs = function (_React$Component) {
       reqStatus: '',
       reqInfo: '',
       jobId: '',
+      jobData: {},
       showJobId: false,
       showStatus: false
     };
@@ -41670,9 +41668,21 @@ var Jobs = function (_React$Component) {
   }
 
   _createClass(Jobs, [{
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      var _this2 = this;
+
+      fetch('/data').then(function (res) {
+        return res.json();
+      }).then(function (json) {
+        console.log(json["data"]);
+        _this2.setState({ jobData: json["data"] });
+      });
+    }
+  }, {
     key: 'submitJob',
     value: function submitJob(event) {
-      var _this2 = this;
+      var _this3 = this;
 
       event.preventDefault();
       var data = JSON.stringify({ url: this.state.url });
@@ -41686,7 +41696,11 @@ var Jobs = function (_React$Component) {
       }).then(function (res) {
         return res.json();
       }).then(function (json) {
-        _this2.setState({ jobId: json.id, showJobId: true });
+        console.log(json["data"]);
+        _this3.setState({ jobId: json["id"].id, jobData: json["data"], showJobId: true });
+        Object.keys(json["data"]).map(function (jobs) {
+          return console.log(JSON.parse(_this3.state.jobData[jobs]).status);
+        });
       }).catch(function (err) {
         console.log('ERROR: ', err);
       });
@@ -41694,14 +41708,14 @@ var Jobs = function (_React$Component) {
   }, {
     key: 'requestJob',
     value: function requestJob(event) {
-      var _this3 = this;
+      var _this4 = this;
 
       event.preventDefault();
       fetch('/jobs/' + this.state.reqId).then(function (res) {
         return res.json();
       }).then(function (json) {
         var data = JSON.parse(json);
-        _this3.setState({ reqStatus: data.status, reqInfo: data.html || 'Still processing...', showStatus: true });
+        _this4.setState({ reqStatus: data.status, reqInfo: data.html || 'Still processing...', showStatus: true });
       });
     }
   }, {
@@ -41727,49 +41741,102 @@ var Jobs = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
+      var _this5 = this;
+
       return React.createElement(
         'div',
-        { style: { display: "flex", flexDirection: "column", alignItems: "center" } },
+        null,
         React.createElement(
           'div',
-          { className: 'col-sm-4' },
+          { style: { display: "flex", flexDirection: "column" }, className: 'col-sm-4' },
           React.createElement(
-            'form',
-            { className: 'form-group', onSubmit: this.submitJob },
+            'div',
+            null,
             React.createElement(
-              'h2',
-              { className: 'form-signin-heading' },
-              'Submit Job'
-            ),
+              'form',
+              { className: 'form-group', onSubmit: this.submitJob },
+              React.createElement(
+                'h2',
+                { className: 'form-signin-heading' },
+                'Submit Job'
+              ),
+              React.createElement(
+                'h3',
+                null,
+                'Must be an absolute url, eg http://example.com/'
+              ),
+              React.createElement('input', { value: this.state.url, className: 'form-control', onChange: this.changeUrl, type: 'text', required: true, placeholder: 'http://example.com/' }),
+              React.createElement(
+                'button',
+                { className: 'btn btn-default', type: 'submit' },
+                'Submit'
+              )
+            )
+          ),
+          React.createElement(
+            'div',
+            null,
             React.createElement(
-              'h3',
-              null,
-              'Must be an absolute url, eg http://example.com/'
-            ),
-            React.createElement('input', { value: this.state.url, className: 'form-control', onChange: this.changeUrl, type: 'text', required: true, placeholder: 'http://example.com/' }),
-            React.createElement(
-              'button',
-              { className: 'btn btn-default', type: 'submit' },
-              'Submit'
+              'form',
+              { className: 'form-group', onSubmit: this.requestJob },
+              React.createElement(
+                'h2',
+                null,
+                'Insert Job ID'
+              ),
+              React.createElement('input', { value: this.state.reqId, className: 'form-control', onChange: this.changeId, type: 'text', required: true, placeholder: 'Enter Job ID' }),
+              React.createElement(
+                'button',
+                { className: 'btn btn-default', type: 'submit' },
+                'Request Job'
+              )
             )
           )
         ),
         React.createElement(
           'div',
-          { className: 'col-sm-4' },
+          { className: 'col-sm-8' },
           React.createElement(
-            'form',
-            { className: 'form-group', onSubmit: this.requestJob },
+            'table',
+            { className: 'table table-bordered' },
             React.createElement(
-              'h2',
+              'thead',
               null,
-              'Insert Job ID'
+              React.createElement(
+                'tr',
+                null,
+                React.createElement(
+                  'th',
+                  null,
+                  'URL'
+                ),
+                React.createElement(
+                  'th',
+                  null,
+                  'Job ID'
+                )
+              )
             ),
-            React.createElement('input', { value: this.state.reqId, className: 'form-control', onChange: this.changeId, type: 'text', required: true, placeholder: 'Enter Job ID' }),
             React.createElement(
-              'button',
-              { className: 'btn btn-default', type: 'submit' },
-              'Request Job'
+              'tbody',
+              null,
+              this.state.jobData ? Object.keys(this.state.jobData).map(function (jobId) {
+                var data = _this5.state.jobData;
+                return React.createElement(
+                  'tr',
+                  null,
+                  React.createElement(
+                    'td',
+                    null,
+                    JSON.parse(data[jobId]).url
+                  ),
+                  React.createElement(
+                    'td',
+                    null,
+                    jobId
+                  )
+                );
+              }) : null
             )
           )
         ),
@@ -41849,6 +41916,11 @@ var Jobs = function (_React$Component) {
 
   return Jobs;
 }(React.Component);
+
+// {this.state.data ? Object.keys(this.state.jobData).map((jobId) => {
+//   var data = this.state.jobData
+//   return <tr><td>{JSON.parse(data[jobId]).url}</td><td>{JSON.parse(data[jobId]).status}</td><td>{jobId}</td></tr>
+// }) : null}
 
 ReactDOM.render(React.createElement(Jobs, { name: 'Irvin' }), document.getElementById('root'));
 

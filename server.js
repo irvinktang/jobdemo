@@ -26,14 +26,9 @@ app.get('/', function(req,res){
   res.sendFile(path.join(__dirname, 'index.html'))
 })
 
-app.post('/jobs', function(req,res){
-  var jobId = uuid();
-  client.rpush('jobQueue', JSON.stringify({url: req.body.url, id: jobId}), function(err,reply) {
-    if(err) throw(err)
-    client.hset('jobs', jobId, JSON.stringify({status: 'in progress'}), function(err, reply1) {
-      if(err) throw(err)
-      res.json({id: jobId})
-    })
+app.get('/data', function(req,res){
+  client.hgetall('jobs', function(err,jobs){
+    res.json({data: jobs})
   })
 })
 
@@ -43,14 +38,28 @@ app.get('/jobs/:id',function(req,res){
   })
 })
 
+app.post('/jobs', function(req,res){
+  var jobId = uuid();
+  client.rpush('jobQueue', JSON.stringify({url: req.body.url, id: jobId}), function(err,reply) {
+    if(err) throw(err)
+    client.hset('jobs', jobId, JSON.stringify({url: req.body.url, status: 'in progress'}), function(err, reply1) {
+      if(err) throw(err)
+      client.hgetall('jobs', function(err,jobs){
+        res.json({id: {id: jobId},data:jobs})
+      })
+    })
+  })
+})
+
 function processJob(err, job) {
-  client.blpop('jobQueue',2, processJob)
+  client.blpop('jobQueue',1, processJob)
   if(err) throw(err)
   if(job) {
-    fetch(JSON.parse(job[1]).url)
+    var url = JSON.parse(job[1]).url
+    fetch(url)
       .then(res => res.text())
       .then(body => {
-        client.hset('jobs',JSON.parse(job[1]).id, JSON.stringify({status: 'completed', html: body}), function(err,status){
+        client.hset('jobs',JSON.parse(job[1]).id, JSON.stringify({url: url, status: 'completed', html: body}), function(err,status){
           if(err) throw(err)
           console.log('success')
         })
@@ -60,7 +69,7 @@ function processJob(err, job) {
   }
 }
 
-client.blpop('jobQueue',2, processJob)
+client.blpop('jobQueue',1, processJob)
 
 app.listen(process.env.PORT || 3000, function(){
   console.log('running')
