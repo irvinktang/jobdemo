@@ -42,7 +42,7 @@ app.post('/jobs', function(req,res){
   var jobId = uuid();
   client.rpush('jobQueue', JSON.stringify({url: req.body.url, id: jobId}), function(err,reply) {
     if(err) throw(err)
-    client.hset('jobs', jobId, JSON.stringify({url: req.body.url, status: 'in progress'}), function(err, reply1) {
+    client.hset('jobs', jobId, JSON.stringify({url: req.body.url, status: 'In Progress'}), function(err, reply1) {
       if(err) throw(err)
       client.hgetall('jobs', function(err,jobs){
         res.json({id: {id: jobId},data:jobs})
@@ -57,13 +57,13 @@ function processJob(err, job) {
   if(job) {
     var url = JSON.parse(job[1]).url
     fetch(url)
-      .then(res => res.text())
-      .then(body => {
-        client.hset('jobs',JSON.parse(job[1]).id, JSON.stringify({url: url, status: 'completed', html: body}), function(err,status){
-          if(err) throw(err)
-          console.log('success')
-        })
+    .then(res => res.text())
+    .then(body => {
+      client.hset('jobs',JSON.parse(job[1]).id, JSON.stringify({url: url, status: 'Completed', html: body}), function(err,status){
+        if(err) throw(err)
+        console.log('success')
       })
+    })
   } else {
     console.log(job)
   }
