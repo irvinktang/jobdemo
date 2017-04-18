@@ -45,13 +45,16 @@ app.post("/jobs", function(req, res) {
     JSON.stringify({ url: req.body.url, id: jobId }),
     function(err, reply) {
       if (err) throw err;
+      console.log('11111111111')
       client.hset(
         "jobs",
         jobId,
         JSON.stringify({ url: req.body.url, status: "In Progress" }),
         function(err, reply1) {
           if (err) throw err;
+          console.log('2222222222')
           client.hgetall("jobs", function(err, jobs) {
+            console.log('hello')
             res.json({ id: { id: jobId }, data: jobs });
           });
         }
@@ -60,8 +63,10 @@ app.post("/jobs", function(req, res) {
   );
 });
 
+var jq = redis.createClient(process.env.REDIS_URL);
+
 function processJob(err, job) {
-  client.blpop("jobQueue", 1, processJob);
+  jq.blpop("jobQueue", 0, processJob);
   if (err) throw err;
   if (job) {
     var url = JSON.parse(job[1]).url;
@@ -81,7 +86,8 @@ function processJob(err, job) {
   }
 }
 
-client.blpop("jobQueue", 1, processJob);
+
+jq.blpop("jobQueue", 0, processJob);
 
 app.listen(process.env.PORT || 3000, function() {
   console.log("running");
