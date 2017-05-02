@@ -4,7 +4,7 @@ Simple job queue web app built using JavaScript
 
 ## Getting Started
 
-App deployed on Heroku: https://massdrop-jobqueue.herokuapp.com/
+App deployed on Heroku: https://jobqueuedemo.herokuapp.com/
 
 ### Running app locally:
 
